@@ -374,9 +374,22 @@ else
         if [[ "${iface}" == "${primary}" ]]; then
             continue
         fi
-        /sbin/ifconfig ${iface} plumb
-        if [[ ! -f /etc/hostname.${iface} ]]; then
-            /sbin/ifconfig ${iface} dhcp start wait 0
+        if [[ -f /etc/dhcp6.${iface} ]]; then
+            /sbin/ifconfig ${iface} inet6 plumb
+            /sbin/ifconfig ${iface} inet6 dhcp
+        elif [[ -f /etc/hostname6.${iface} ]]; then
+            for file in /etc/hostname6.${iface}:*; do
+                if [[ -f ${file} ]]; then
+                    viface=${file##*\.}
+                    ifconfig ${viface} inet6 plumb
+                    ifconfig ${viface} `cat ${file}` up
+                fi
+            done
+        else
+            /sbin/ifconfig ${iface} plumb
+            if [[ ! -f /etc/hostname.${iface} ]]; then
+                /sbin/ifconfig ${iface} dhcp start wait 0
+            fi
         fi
     done
 fi
