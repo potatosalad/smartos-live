@@ -352,7 +352,7 @@ else
                 /sbin/ifconfig ${iface} inet `cat /etc/hostname.${iface}` up
             fi
         else
-            if [[ -z "${first_iface}" ]]; then
+            if [[ -z "${first_iface}" && ! -f /etc/hostname6.${iface} ]]; then
                 first_iface=${iface}
             fi
             if [[ -z "${primary}" && -f /etc/dhcp.${iface} ]]; then
@@ -378,11 +378,12 @@ else
             /sbin/ifconfig ${iface} inet6 plumb
             /sbin/ifconfig ${iface} inet6 dhcp
         elif [[ -f /etc/hostname6.${iface} ]]; then
+            /sbin/ifconfig ${iface} inet6 plumb
             for file in /etc/hostname6.${iface}:*; do
                 if [[ -f ${file} ]]; then
                     viface=${file##*\.}
                     ifconfig ${viface} inet6 plumb
-                    ifconfig ${viface} `cat ${file}` up
+                    ifconfig ${viface} inet6 `cat ${file}` up
                 fi
             done
         else
