@@ -294,16 +294,10 @@ IPNAT
 
     # Set up the GZ to NAT for SoftLayer on 172.16.0.0/12
     if [[ "${CONFIG_softlayer}" == "true" ]]; then
-        echo ipadm create-addr -t -T static -a 172.16.0.1/12 external0/v4nat
-        ipadm create-addr -t -T static -a 172.16.0.1/12 external0/v4nat
-
         cat >> /etc/ipf/ipnat.conf <<IPNAT
 map external0 172.16.0.0/12 -> 0/32 portmap tcp/udp auto
 map external0 172.16.0.0/12 -> 0/32
 IPNAT
-
-        echo route add 10.0.0.0/8 "${CONFIG_admin_gateway}"
-        route add 10.0.0.0/8 "${CONFIG_admin_gateway}"
     fi
 
     # Setup extra nics, if specified in the config file
