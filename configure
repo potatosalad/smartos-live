@@ -20,6 +20,9 @@
 shopt -s xpg_echo
 unalias -a
 
+PATH=/usr/bin:/usr/sbin:/sbin:/opt/local/bin:/opt/local/sbin
+export PATH
+
 conf_arg0=$(basename $0)
 conf_arg0_dir=$(dirname $0)
 conf_root=$PWD
@@ -73,7 +76,7 @@ function install_pkgin
 {
 	for pkg in gmake binutils autoconf automake bison flex libtool-base \
 	    python24 libxslt gcc-compiler sun-jre6 sun-jdk6 gmp \
-	    mpfr nodejs p5-XML-Parser; do
+	    mpfr nodejs p5-XML-Parser gettext; do
 		if ! pkg_info -qe $pkg; then
 			$conf_priv pkgin -y install $pkg || fatal \
 		    "failed to install $pkg"
@@ -101,7 +104,7 @@ function fetch_studio
 	[[ -f "/opt/SUNWspro/prod/bin/cc" ]] && return
 	[[ -z "$SUNW_SPRO12_URL" ]] && fatal \
 	    "SUNW_SPRO12_URL not set in configure.*"
-	curl -k "$SUNW_SPRO12_URL" | $conf_priv tar jxf - -C /opt
+	curl -k "$SUNW_SPRO12_URL" | bzcat | $conf_priv tar xf - -C /opt
 	[[ $? -eq 0 ]] || fatal "failed to fetch Studio"
 	[[ -e /opt/SUNspro/sunstudio12.1 ]] && return
 	$conf_priv ln -s /opt/SUNWspro /opt/SUNWspro/sunstudio12.1 || fatal \
@@ -258,6 +261,7 @@ __GNUC="";					export __GNUC
 __GNUC4="";					export __GNUC4
 JAVA_ROOT=/opt/local/java/sun6;			export JAVA_ROOT
 FLEX=/opt/local/bin/flex;			export FLEX
+GNUXGETTEXT=/opt/local/bin/xgettext;		export GNUXGETTEXT
 EOF
 	[[ $? -eq 0 ]] || fatal "failed to write illumos nightly env file"
 }
